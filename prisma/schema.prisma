@@ -1,0 +1,285 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(MEMBER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model AgencyBranding {
+  id          String   @id @default(uuid())
+  agencyName  String   @default("Atiende")
+  agencyLogo  String?
+  updatedAt   DateTime @updatedAt
+}
+
+model BusinessProfile {
+  id          String   @id @default(uuid())
+  name        String
+  activity    String
+  address     String
+  phone       String
+  website     String
+  generalInfo String?  @db.Text
+  timeZone    String   @default("Europe/Madrid")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  assistantSettings AssistantSettings?
+  services          Service[]
+  faqs              Faq[]
+}
+
+enum Tone {
+  cercano
+  profesional
+  directo
+}
+
+enum OutOfHoursAction {
+  appointment
+  message
+}
+
+model AssistantSettings {
+  id                 String           @id @default(uuid())
+  businessId         String           @unique
+  business           BusinessProfile  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  name               String           @default("Lumen")
+  avatarUrl          String?
+  tone               Tone             @default(cercano)
+  welcomeMessage     String           @db.Text
+  instructions       String           @db.Text
+  forbiddenRules     String           @db.Text // JSON array de reglas prohibidas
+  businessHours      String           @db.Text // JSON con horario semanal
+  outOfHoursAction   OutOfHoursAction @default(appointment)
+  
+  // Reglas de pase a persona
+  handoffComplaint   Boolean          @default(true)
+  handoffUrgency     Boolean          @default(true)
+  handoffHumanAsk    Boolean          @default(true)
+  handoffUnknown     Boolean          @default(true)
+  handoffCustomRule  String?          @db.Text
+
+  isEnabled          Boolean          @default(true)
+  safeMode           Boolean          @default(false)
+  selectedModel      String           @default("anthropic/claude-haiku-5.5")
+  inputTokensCost    Float            @default(0.80) // $ por M tokens entrada
+  outputTokensCost   Float            @default(4.00) // $ por M tokens salida
+
+  updatedAt          DateTime         @updatedAt
+}
+
+enum PriceType {
+  exacto
+  desde
+}
+
+model Service {
+  id                  String          @id @default(uuid())
+  businessId          String
+  business            BusinessProfile @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  name                String
+  description         String          @db.Text
+  durationMin         Int             @default(30)
+  price               Float
+  priceType           PriceType       @default(exacto)
+  requiresAssessment  Boolean         @default(false)
+  depositAmount       Float?          // Señal específica con Stripe
+  isActive            Boolean         @default(true)
+  orderIndex          Int             @default(0)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  appointments        Appointment[]
+}
+
+model Faq {
+  id          String          @id @default(uuid())
+  businessId  String
+  business    BusinessProfile @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  question    String          @db.Text
+  answer      String          @db.Text
+  category    String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+enum IntegrationProvider {
+  GOOGLE_CALENDAR
+  GMAIL
+  GOOGLE_SHEETS
+  SLACK
+  STRIPE
+  WEBHOOK
+}
+
+enum IntegrationStatus {
+  DISCONNECTED
+  CONNECTED
+  ERROR
+}
+
+model Integration {
+  id                   String              @id @default(uuid())
+  provider             IntegrationProvider @unique
+  status               IntegrationStatus   @default(DISCONNECTED)
+  accountEmailOrId     String?
+  encryptedAccessToken String?             @db.Text
+  encryptedRefreshToken String?            @db.Text
+  tokenExpiry          DateTime?
+  scopes               String?             @db.Text // JSON array de scopes
+  config               String?             @db.Text // JSON con configuración específica
+  enabledTools         String?             @db.Text // JSON array de nombres de tools permitidas
+  errorMessage         String?             @db.Text
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+}
+
+enum Channel {
+  WHATSAPP
+  WEB
+}
+
+model Contact {
+  id                     String         @id @default(uuid())
+  name                   String?
+  phone                  String?
+  email                  String?
+  whatsappLid            String?
+  channel                Channel        @default(WHATSAPP)
+  interest               String?
+  hasRequestedAppointment Boolean       @default(false)
+  notes                  String?        @db.Text
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  conversations          Conversation[]
+  appointments           Appointment[]
+}
+
+enum ConversationStatus {
+  ACTIVE
+  HANDOFF_REQUIRED
+  HUMAN_CONTROL
+  CLOSED
+}
+
+model Conversation {
+  id                   String             @id @default(uuid())
+  contactId            String
+  contact              Contact            @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  channel              Channel            @default(WHATSAPP)
+  status               ConversationStatus @default(ACTIVE)
+  humanControlAssignedTo String?
+  unreadCount          Int                @default(0)
+  lastMessageAt        DateTime           @default(now())
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  messages             Message[]
+}
+
+enum SenderType {
+  CLIENT
+  ASSISTANT
+  HUMAN_AGENT
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderType     SenderType
+  content        String       @db.Text
+  toolCalls      String?      @db.Text // JSON array con detalle de tools llamadas
+  createdAt      DateTime     @default(now())
+}
+
+enum AppointmentStatus {
+  CONFIRMED
+  RESCHEDULED
+  CANCELLED
+}
+
+enum DepositStatus {
+  NONE
+  PENDING
+  PAID
+}
+
+model Appointment {
+  id                   String            @id @default(uuid())
+  contactId            String
+  contact              Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  serviceId            String
+  service              Service           @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  startTime            DateTime
+  endTime              DateTime
+  calendarEventId      String?
+  status               AppointmentStatus @default(CONFIRMED)
+  depositStatus        DepositStatus     @default(NONE)
+  paymentUrl           String?
+  depositAmount        Float?
+  createdViaAssistant  Boolean           @default(true)
+  reminderSentAt       DateTime?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+}
+
+enum ActivityResult {
+  SUCCESS
+  ERROR
+  WARNING
+}
+
+model ActivityLog {
+  id                  String               @id @default(uuid())
+  integrationProvider IntegrationProvider?
+  channel             Channel?
+  action              String
+  details             String?              @db.Text // JSON con parámetros o respuesta
+  result              ActivityResult       @default(SUCCESS)
+  errorMessage        String?              @db.Text
+  createdAt           DateTime             @default(now())
+}
+
+model ChannelSettings {
+  id                   String   @id @default(uuid())
+  channel              Channel  @unique
+  isEnabled            Boolean  @default(true)
+  // Configuración Web
+  primaryColor         String   @default("#0f766e")
+  welcomeText          String   @default("¡Hola! ¿En qué podemos ayudarte hoy?")
+  buttonPosition       String   @default("bottom-right")
+  // Configuración WhatsApp
+  connectedNumber      String?
+  connectedLid         String?
+  qrCode               String?  @db.Text
+  connectionStatus     String   @default("DISCONNECTED") // DISCONNECTED, WAITING_QR, CONNECTED
+  updatedAt            DateTime @updatedAt
+}
+
+model WorkerCommand {
+  id        String   @id @default(uuid())
+  command   String   // RESTART, DISCONNECT, SEND_MESSAGE, REFRESH_QR
+  payload   String?  @db.Text
+  isHandled Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
