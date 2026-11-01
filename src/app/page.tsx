@@ -1,4 +1,5 @@
 import { DashboardShell } from "@/components/layout/DashboardShell";
+import { AssistantToggle } from "@/components/AssistantToggle";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import {
@@ -55,23 +56,7 @@ export default async function DashboardPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-4 bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm">
-            <span className="text-sm font-medium text-slate-700 pl-2">
-              Asistente {assistant?.isEnabled ? "encendido" : "en pausa"}
-            </span>
-            <form action="/api/assistant/toggle-status" method="POST">
-              <button
-                type="submit"
-                className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all shadow-sm ${
-                  assistant?.isEnabled
-                    ? "bg-emerald-600 hover:bg-emerald-700 text-white"
-                    : "bg-slate-200 hover:bg-slate-300 text-slate-700"
-                }`}
-              >
-                {assistant?.isEnabled ? "Encendido (Atendiendo)" : "En pausa"}
-              </button>
-            </form>
-          </div>
+          <AssistantToggle initialStatus={Boolean(assistant?.isEnabled)} />
         </div>
 
         {/* Tarjetas de Métricas Clave */}

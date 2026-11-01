@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.redirect(new URL("/", request.url), 303);
+    return NextResponse.json({ success: true, isEnabled: updated.isEnabled });
   } catch (error) {
     console.error("Error al alternar estado del asistente:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
