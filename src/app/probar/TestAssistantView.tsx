@@ -38,7 +38,7 @@ export function TestAssistantView() {
     {
       role: "assistant",
       content:
-        "¡Hola! 👋 Soy Lumen, el asistente virtual de Clínica Dental Lumen. ¿En qué puedo ayudarte hoy? Si lo deseas, puedo informarte sobre nuestros tratamientos o agendarte una cita con nuestros doctores.",
+        "¡Hola! 👋 Soy Wopyy, el asistente virtual de Wopyy Nails. ¿En qué puedo ayudarte hoy? Si lo deseas, puedo informarte sobre nuestros tratamientos o agendarte una cita con nuestros doctores.",
     },
   ]);
   const [inputText, setInputText] = useState("");
@@ -119,7 +119,7 @@ export function TestAssistantView() {
       {
         role: "assistant",
         content:
-          "¡Hola! 👋 Soy Lumen, el asistente virtual de Clínica Dental Lumen. ¿En qué puedo ayudarte hoy?",
+          "¡Hola! 👋 Soy Wopyy, el asistente virtual de Wopyy Nails. ¿En qué puedo ayudarte hoy?",
       },
     ]);
     setTimeline([]);
@@ -177,7 +177,7 @@ export function TestAssistantView() {
             <div className="flex items-center gap-2.5">
               <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-xs font-semibold text-slate-800">
-                Lumen (En línea · Clínica Dental Lumen)
+                Wopyy (En línea · Wopyy Nails)
               </span>
             </div>
             {safeMode && (
@@ -240,7 +240,7 @@ export function TestAssistantView() {
                   <div className="w-2 h-2 rounded-full bg-teal-600 animate-bounce [animation-delay:0.2s]" />
                   <div className="w-2 h-2 rounded-full bg-teal-600 animate-bounce [animation-delay:0.4s]" />
                   <span className="text-[11px] font-medium text-slate-600">
-                    Lumen está escribiendo y consultando herramientas…
+                    El asistente está escribiendo y consultando herramientas…
                   </span>
                 </div>
               </div>

@@ -39,8 +39,8 @@ const navItems = [
 
 export function Sidebar({
   agencyName = "Atiende",
-  businessName = "Clínica Dental Lumen",
-  assistantName = "Lumen",
+  businessName = "Wopyy Nails",
+  assistantName = "Wopyy",
   isAssistantActive = true,
 }: SidebarProps) {
   const pathname = usePathname();

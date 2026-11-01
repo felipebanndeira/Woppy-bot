@@ -14,8 +14,8 @@ export async function DashboardShell({ children }: { children: ReactNode }) {
       <Sidebar
         agencyName={branding?.agencyName || "Atiende"}
         agencyLogo={branding?.agencyLogo}
-        businessName={business?.name || "Clínica Dental Lumen"}
-        assistantName={assistant?.name || "Lumen"}
+        businessName={business?.name || "Wopyy Nails"}
+        assistantName={assistant?.name || "Wopyy"}
         isAssistantActive={assistant?.isEnabled ?? true}
       />
       <main className="flex-1 overflow-y-auto">

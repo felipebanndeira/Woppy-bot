@@ -9,7 +9,7 @@ interface BehaviorFormProps {
 }
 
 export function BehaviorForm({ business, initialSettings }: BehaviorFormProps) {
-  const [name, setName] = useState(initialSettings?.name || "Lumen");
+  const [name, setName] = useState(initialSettings?.name || "Wopyy");
   const [tone, setTone] = useState(initialSettings?.tone || "cercano");
   const [welcomeMessage, setWelcomeMessage] = useState(initialSettings?.welcomeMessage || "");
   const [instructions, setInstructions] = useState(initialSettings?.instructions || "");
@@ -149,7 +149,7 @@ FUERA DEL HORARIO DE ATENCIÓN:
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"
-              placeholder="Ej: Lumen"
+              placeholder="Ej: Wopyy"
             />
           </div>
 
@@ -374,7 +374,7 @@ FUERA DEL HORARIO DE ATENCIÓN:
             value={handoffCustomRule}
             onChange={(e) => setHandoffCustomRule(e.target.value)}
             className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"
-            placeholder="Ej: Si menciona un dolor agudo o traumatismo dental..."
+            placeholder="Ej: Si solicita un diseño de nail art complejo o turnos urgentes..."
           />
         </div>
       </div>

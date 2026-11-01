@@ -349,7 +349,7 @@ export function KnowledgeManager({
                   required
                   value={newServiceName}
                   onChange={(e) => setNewServiceName(e.target.value)}
-                  placeholder="Ej: Empaste dental"
+                  placeholder="Ej: Kapping Gel con diseño"
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg"
                 />
               </div>

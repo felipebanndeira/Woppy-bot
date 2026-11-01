@@ -285,7 +285,7 @@ export function IntegrationsCatalog({
                 <div>
                   <h3 className="font-bold text-slate-900 text-base">Google Sheets</h3>
                   <p className="text-xs text-slate-500 mt-1">
-                    Crea la hoja «Contactos — Lumen» y sincroniza cada contacto y paciente con permiso restringido.
+                    Crea la hoja «Contactos — Wopyy» y sincroniza cada contacto y paciente con permiso restringido.
                   </p>
                 </div>
 

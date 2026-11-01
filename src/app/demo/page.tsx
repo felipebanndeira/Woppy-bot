@@ -26,10 +26,10 @@ export default function DemoPage() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-                Clínica Dental Lumen
+                Wopyy Nails
               </h1>
               <p className="text-xs text-slate-500">
-                Odontología avanzada y estética dental · Madrid
+                Estudio de Manicuría y Uñas — Oberá, Misiones
               </p>
             </div>
           </div>
@@ -53,7 +53,7 @@ export default function DemoPage() {
             Cuidamos de tu sonrisa con tecnología y cercanía.
           </h2>
           <p className="text-slate-600 text-sm leading-relaxed">
-            Somos especialistas en ortodoncia invisible, implantes y estética dental sin dolor. Consulta con nuestro asistente virtual abajo a la derecha para pedir cita en tiempo real o resolver cualquier consulta.
+            Especialistas en Semipermanente, Kapping Gel, Soft Gel y manicuría.
           </p>
         </div>
       </main>

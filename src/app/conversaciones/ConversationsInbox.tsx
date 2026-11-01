@@ -279,7 +279,7 @@ export function ConversationsInbox({ conversations: initialConversations }: Conv
                     >
                       <div className="flex items-center justify-between text-[10px] mb-1 opacity-70">
                         <span>
-                          {isClient ? "Cliente" : isAssistant ? "Lumen (IA)" : "Persona del Equipo"}
+                          {isClient ? "Cliente" : isAssistant ? "Wopyy (IA)" : "Persona del Equipo"}
                         </span>
                         <span>
                           {new Intl.DateTimeFormat("es-ES", {
