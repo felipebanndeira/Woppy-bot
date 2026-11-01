@@ -25,27 +25,29 @@ export function ChannelsManager({ initialWa, initialWeb, appUrl }: ChannelsManag
   const [copiedScript, setCopiedScript] = useState(false);
   const [loadingAction, setLoadingAction] = useState(false);
 
-  // Escucha SSE en tiempo real para el código QR y estado de WhatsApp
+  // Sondeo de estado y código QR en tiempo real
   useEffect(() => {
-    const eventSource = new EventSource("/api/channels/whatsapp/sse");
-
-    eventSource.onmessage = (event) => {
+    const fetchStatus = async () => {
       try {
-        const data = JSON.parse(event.data);
-        setWaState((prev: any) => ({
-          ...prev,
-          connectionStatus: data.status,
-          qrCode: data.qrCode,
-          connectedNumber: data.connectedNumber,
-        }));
-      } catch (e) {
-        console.error("Error SSE:", e);
+        const res = await fetch("/api/channels/whatsapp/status");
+        if (res.ok) {
+          const data = await res.json();
+          setWaState((prev: any) => ({
+            ...prev,
+            connectionStatus: data.status,
+            qrCode: data.qrCode,
+            connectedNumber: data.connectedNumber,
+          }));
+        }
+      } catch (err) {
+        // Ignorar
       }
     };
 
-    return () => {
-      eventSource.close();
-    };
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 2000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleDisconnectWa = async () => {
