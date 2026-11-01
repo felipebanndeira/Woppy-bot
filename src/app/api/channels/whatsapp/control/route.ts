@@ -9,18 +9,19 @@ export async function POST(request: NextRequest) {
       await prisma.workerCommand.create({
         data: { command: "DISCONNECT" },
       });
-      return NextResponse.json({ success: true, message: "Orden de desconexión enviada al worker" });
+      return NextResponse.json({ success: true, message: "Orden de desconexión enviada" });
     }
 
     if (action === "reconnect") {
       await prisma.workerCommand.create({
         data: { command: "RECONNECT" },
       });
-      return NextResponse.json({ success: true, message: "Orden de reconexión enviada al worker" });
+      return NextResponse.json({ success: true, message: "Orden de reconexión enviada" });
     }
 
     return NextResponse.json({ error: "Acción no válida" }, { status: 400 });
-  } catch (error) {
-    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Error en control de WhatsApp:", error);
+    return NextResponse.json({ error: error?.message || "Error interno" }, { status: 500 });
   }
 }
