@@ -1,4 +1,5 @@
 import { prisma } from "../prisma";
+import { getWopyyOccupiedSlots, createWopyyAppointment } from "../integrations/wopyyFirestore";
 
 export interface ToolDefinition {
   name: string;
@@ -297,86 +298,100 @@ export async function executeToolCall(
     }
 
     case "check_available_slots": {
-      // Cálculo de huecos libres dentro del horario L-V 9:00-14:00 y 16:00-20:00
-      const dateStr = args.date;
-      const slots = [
-        `${dateStr}T10:00:00`,
-        `${dateStr}T11:30:00`,
-        `${dateStr}T16:30:00`,
-        `${dateStr}T17:30:00`,
-        `${dateStr}T18:30:00`,
-      ];
+      const dateStr = args.date; // YYYY-MM-DD
+      const allSlots = ["08:00", "09:30", "11:00", "14:00", "15:30", "17:00", "18:30", "20:00"];
+
+      // Consultar turnos ya reservados en la web de Wopyy (Firestore)
+      const occupied = await getWopyyOccupiedSlots(dateStr);
+      const freeSlots = allSlots.filter((time) => !occupied.includes(time));
+      const formattedSlots = freeSlots.map((time) => `${dateStr}T${time}:00`);
+
       return {
         tool: toolName,
         args,
-        output: { date: dateStr, availableSlots: slots },
-        isSimulated: safeMode,
-        uiTimelineSummary: `Consultando Google Calendar… ${slots.length} huecos libres para el ${dateStr}`,
+        output: { date: dateStr, availableSlots: formattedSlots, freeTimes: freeSlots },
+        isSimulated: false,
+        uiTimelineSummary: `Consultando agenda web de Wopyy: ${freeSlots.length} horarios libres para el ${dateStr}`,
       };
     }
 
     case "create_appointment": {
-      if (safeMode) {
-        return {
-          tool: toolName,
-          args,
-          output: {
-            success: true,
-            appointmentId: "sim-apt-12345",
-            startTime: args.startTime,
-            service: args.serviceName,
-            status: "CONFIRMED_SIMULATED",
-          },
-          isSimulated: true,
-          uiTimelineSummary: `[Modo Seguro] Simulación: Cita creada para ${args.clientName} (${args.serviceName}) el ${args.startTime}`,
-        };
-      }
+      const clientName = args.clientName || "Clienta WhatsApp";
+      const clientPhone = args.clientPhone || "";
+      const serviceName = args.serviceName || "Servicio Wopyy";
+      const startTime = String(args.startTime);
 
-      // Si no es simulado, crear en BD (y Google Calendar cuando esté conectado)
-      let service = await prisma.service.findFirst({
-        where: { businessId, name: { contains: args.serviceName } },
+      const parts = startTime.split("T");
+      const appointmentDate = parts[0];
+      const appointmentTime = parts[1] ? parts[1].substring(0, 5) : "16:00";
+
+      let amount = 15000;
+      let category = "Uñas";
+      try {
+        const found = await prisma.service.findFirst({
+          where: { name: { contains: serviceName, mode: "insensitive" } },
+        });
+        if (found) {
+          amount = found.price;
+          category = found.category || "Uñas";
+        }
+      } catch {}
+
+      // 1. Guardar en Firestore para que la web de Wopyy lo refleje y bloquee de inmediato
+      const firestoreResult = await createWopyyAppointment({
+        customerName: clientName,
+        customerPhone: clientPhone,
+        serviceName,
+        category,
+        amount,
+        appointmentDate,
+        appointmentTime,
       });
-      if (!service) {
-        service = await prisma.service.findFirst({ where: { businessId } });
-      }
 
-      let contact = contactId ? await prisma.contact.findUnique({ where: { id: contactId } }) : null;
-      if (!contact) {
-        contact = await prisma.contact.create({
+      // 2. Guardar también en la base interna de Prisma/CRM
+      try {
+        let contact = contactId ? await prisma.contact.findUnique({ where: { id: contactId } }) : null;
+        if (!contact) {
+          contact = await prisma.contact.create({
+            data: {
+              name: clientName,
+              phone: clientPhone || null,
+              email: args.clientEmail || null,
+              hasRequestedAppointment: true,
+            },
+          });
+        }
+
+        const start = new Date(startTime);
+        const end = new Date(start.getTime() + 90 * 60000);
+
+        await prisma.appointment.create({
           data: {
-            name: args.clientName,
-            phone: args.clientPhone || null,
-            email: args.clientEmail || null,
-            hasRequestedAppointment: true,
+            contactId: contact.id,
+            serviceId: "",
+            startTime: start,
+            endTime: end,
+            status: "CONFIRMED",
+            createdViaAssistant: true,
           },
         });
+      } catch (err) {
+        console.warn("Aviso al guardar en BD interna:", err);
       }
-
-      const start = new Date(args.startTime);
-      const end = new Date(start.getTime() + (service?.durationMin || 30) * 60000);
-
-      const appointment = await prisma.appointment.create({
-        data: {
-          contactId: contact.id,
-          serviceId: service?.id || "",
-          startTime: start,
-          endTime: end,
-          status: "CONFIRMED",
-          createdViaAssistant: true,
-        },
-      });
 
       return {
         tool: toolName,
         args,
         output: {
           success: true,
-          appointmentId: appointment.id,
-          startTime: appointment.startTime,
-          status: appointment.status,
+          firestoreDocId: firestoreResult.id,
+          appointmentDate,
+          appointmentTime,
+          service: serviceName,
+          status: "CONFIRMED",
         },
         isSimulated: false,
-        uiTimelineSummary: `Cita creada en Google Calendar para ${args.clientName} a las ${new Intl.DateTimeFormat("es-ES", { timeZone: "Europe/Madrid", timeStyle: "short", dateStyle: "short" }).format(start)}`,
+        uiTimelineSummary: `¡Turno confirmado y bloqueado en la web de Wopyy! ${clientName} - ${serviceName} el ${appointmentDate} a las ${appointmentTime}`,
       };
     }
 
