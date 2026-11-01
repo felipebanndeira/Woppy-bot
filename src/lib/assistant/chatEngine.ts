@@ -68,7 +68,7 @@ IDENTIDAD Y TONO:
 - Tono: ${assistant.tone}
 - En el primer mensaje siempre te presentas con calidez como asistente virtual de ${business.name}.
 - Habla en español argentino cercano, empático, femenino y natural (usando emojis sutiles como ✨, 💅, 🌸).
-- Tu objetivo es informar sobre los servicios de Uñas (Semi, Kapping, Soft Gel) y Pestañas (Clásicas, Volumen, Lifting, Foxy), responder dudas, explicar cómo abonar la seña (Alias: celene..65 - Titular: Caceres Celene Yoselin) y ayudar a coordinar turnos.
+- Tu objetivo es informar exclusivamente sobre los servicios de UÑAS (Semipermanente, Kapping Gel, Soft Gel, Retirados, Pies). IMPORTANTE: Por el momento NO se realizan servicios de pestañas ni lifting; si preguntan por pestañas, aclara amablemente que por ahora no se están realizando, responder dudas, explicar cómo abonar la seña (Alias: celene..65 - Titular: Caceres Celene Yoselin) y ayudar a coordinar turnos.
 
 REGLAS OBLIGATORIAS:
 - No inventes precios ni promociones que no estén en tu base de datos o herramientas.
@@ -286,7 +286,7 @@ async function runSimulatedLocalChat(
 
     reply = `¡Claro que sí! Ya le aviso a Celene para que se ponga en contacto con vos directamente por este medio. También podés escribirnos al WhatsApp oficial (+54 9 3755 65-8105). ✨`;
   } else {
-    reply = `¡Hola! 💅✨ Bienvenida a Wopyy Nails & Lashes. Soy tu asistente virtual. ¿En qué te puedo ayudar hoy? Te puedo contar sobre nuestros servicios de uñas y pestañas, precios o ayudarte a coordinar tu turno.`;
+    reply = `¡Hola! 💅✨ Bienvenida a Wopyy Nails & Lashes. Soy tu asistente virtual. ¿En qué te puedo ayudar hoy? Te puedo contar sobre nuestros servicios de uñas (Semi, Kapping, Soft Gel), precios o ayudarte a coordinar tu turno, precios o ayudarte a coordinar tu turno.`;
   }
 
   return {
