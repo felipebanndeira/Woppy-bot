@@ -21,7 +21,8 @@ async function main() {
           console.log("🛠️ [Worker] Ejecutando orden: DISCONNECT");
           await wa.disconnect();
         } else if (cmd.command === "RECONNECT") {
-          console.log("🛠️ [Worker] Ejecutando orden: RECONNECT");
+          console.log("🛠️ [Worker] Ejecutando orden: RECONNECT (Re-generando QR)");
+          await wa.disconnect();
           await wa.startSocket();
         }
 

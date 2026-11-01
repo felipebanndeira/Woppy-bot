@@ -9,7 +9,7 @@
     "dev:worker": "tsx src/worker/index.ts",
     "dev": "concurrently -n \"db,web,worker\" -c \"blue,green,magenta\" \"npm run dev:db\" \"npm run dev:web\" \"npm run dev:worker\"",
     "build": "next build",
-    "start": "next start",
+    "start": "npx concurrently -n \"web,worker\" -c \"green,magenta\" \"next start\" \"tsx src/worker/index.ts\"",
     "worker": "tsx src/worker/index.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
