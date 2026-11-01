@@ -42,14 +42,15 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/qrcode": "^1.5.6",
     "@whiskeysockets/baileys": "^6.7.18",
-    "concurrently": "^10.0.6",
-    "tsx": "^4.23.15",
     "autoprefixer": "^10.6.2",
     "bcryptjs": "^3.0.3",
     "cheerio": "^1.2.0",
     "clsx": "^2.1.1",
+    "concurrently": "^10.0.6",
     "dotenv": "^18.0.9",
     "googleapis": "^189.0.0",
+    "jimp": "^1.6.1",
+    "link-preview-js": "^5.0.1",
     "lucide-react": "^1.65.0",
     "next": "^16.4.3",
     "openai": "^7.45.1",
@@ -63,6 +64,7 @@
     "stripe": "^23.1.0",
     "tailwind-merge": "^3.7.0",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
     "zod": "^4.6.7"
   }
 }
