@@ -3,6 +3,7 @@ import makeWASocket, {
   DisconnectReason,
   useMultiFileAuthState,
   fetchLatestBaileysVersion,
+  Browsers,
 } from "@whiskeysockets/baileys";
 import pino from "pino";
 import QRCode from "qrcode";
@@ -47,6 +48,8 @@ export class WhatsAppManager {
         auth: state,
         logger: pino({ level: "silent" }),
         printQRInTerminal: false,
+        browser: Browsers.macOS("Desktop"),
+        syncFullHistory: false,
         generateHighQualityLinkPreview: true,
       });
 
